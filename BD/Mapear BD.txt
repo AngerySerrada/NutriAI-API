@@ -1,0 +1,1 @@
+dotnet ef dbcontext scaffold "Server=DESKTOP-5AJE7OS;Database=NutriAI;Trusted_Connection=True;Encrypt=True;TrustServerCertificate=True;" Microsoft.EntityFrameworkCore.SqlServer --output-dir Models --context AppDbContext --context-dir Context --force
