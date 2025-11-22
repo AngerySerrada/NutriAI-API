@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using NutriAI_API.Filters;
 using NutriAI_Core.DTOs.Options;
 using NutriAI_Data.Context;
 using NutriAI_Services;
@@ -50,6 +51,9 @@ builder.Services.AddSwaggerGen(c =>
             new List<string>()
         }
     });
+
+    // Enable file upload support in Swagger
+    c.OperationFilter<FileUploadOperationFilter>();
 });
 
 // Configure Entity Framework

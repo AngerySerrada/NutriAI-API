@@ -37,11 +37,19 @@ public partial class Usuario
 
     public bool Activo { get; set; }
 
+    public virtual ICollection<Conversacione> Conversaciones { get; set; } = new List<Conversacione>();
+
     public virtual Comuna IdComunaNavigation { get; set; } = null!;
 
     public virtual NivelesActividad IdNivelActividadNavigation { get; set; } = null!;
 
     public virtual Sexo IdSexoNavigation { get; set; } = null!;
+
+    public virtual ICollection<PdfDocument> PdfDocuments { get; set; } = new List<PdfDocument>();
+
+    public virtual ICollection<Receta> Receta { get; set; } = new List<Receta>();
+
+    public virtual ICollection<RecetasPdf> RecetasPdfs { get; set; } = new List<RecetasPdf>();
 
     public virtual ICollection<UsuarioEnfermedad> UsuarioEnfermedads { get; set; } = new List<UsuarioEnfermedad>();
 

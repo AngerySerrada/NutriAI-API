@@ -18,13 +18,25 @@ public partial class AppDbContext : DbContext
 
     public virtual DbSet<Comuna> Comunas { get; set; }
 
+    public virtual DbSet<Conversacione> Conversaciones { get; set; }
+
     public virtual DbSet<Enfermedade> Enfermedades { get; set; }
 
     public virtual DbSet<Ingrediente> Ingredientes { get; set; }
 
+    public virtual DbSet<MensajesConversacion> MensajesConversacions { get; set; }
+
     public virtual DbSet<NivelesActividad> NivelesActividads { get; set; }
 
+    public virtual DbSet<PdfDocument> PdfDocuments { get; set; }
+
     public virtual DbSet<Perfil> Perfils { get; set; }
+
+    public virtual DbSet<Receta> Recetas { get; set; }
+
+    public virtual DbSet<RecetasPdf> RecetasPdfs { get; set; }
+
+    public virtual DbSet<RecetasPdfDetalle> RecetasPdfDetalles { get; set; }
 
     public virtual DbSet<Sexo> Sexos { get; set; }
 
@@ -50,6 +62,23 @@ public partial class AppDbContext : DbContext
 
             entity.Property(e => e.Activo).HasDefaultValue(true);
             entity.Property(e => e.Nombre).HasMaxLength(150);
+        });
+
+        modelBuilder.Entity<Conversacione>(entity =>
+        {
+            entity.HasKey(e => e.IdConversacion);
+
+            entity.HasIndex(e => e.FechaCreacion, "IX_Conversaciones_FechaCreacion").IsDescending();
+
+            entity.HasIndex(e => e.IdUsuario, "IX_Conversaciones_IdUsuario");
+
+            entity.Property(e => e.Activa).HasDefaultValue(true);
+            entity.Property(e => e.FechaCreacion).HasDefaultValueSql("(getutcdate())");
+            entity.Property(e => e.Titulo).HasMaxLength(200);
+
+            entity.HasOne(d => d.IdUsuarioNavigation).WithMany(p => p.Conversaciones)
+                .HasForeignKey(d => d.IdUsuario)
+                .HasConstraintName("FK_Conversaciones_Usuarios");
         });
 
         modelBuilder.Entity<Enfermedade>(entity =>
@@ -80,6 +109,26 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.Proteinas).HasColumnType("decimal(10, 2)");
         });
 
+        modelBuilder.Entity<MensajesConversacion>(entity =>
+        {
+            entity.HasKey(e => e.IdMensaje);
+
+            entity.ToTable("MensajesConversacion");
+
+            entity.HasIndex(e => e.FechaEnvio, "IX_MensajesConversacion_FechaEnvio").IsDescending();
+
+            entity.HasIndex(e => e.IdConversacion, "IX_MensajesConversacion_IdConversacion");
+
+            entity.Property(e => e.FechaEnvio).HasDefaultValueSql("(getutcdate())");
+            entity.Property(e => e.Rol)
+                .HasMaxLength(20)
+                .IsUnicode(false);
+
+            entity.HasOne(d => d.IdConversacionNavigation).WithMany(p => p.MensajesConversacions)
+                .HasForeignKey(d => d.IdConversacion)
+                .HasConstraintName("FK_MensajesConversacion_Conversaciones");
+        });
+
         modelBuilder.Entity<NivelesActividad>(entity =>
         {
             entity.HasKey(e => e.IdNivelActividad).HasName("PK__NivelesA__8AEE982A1DFC92B8");
@@ -88,6 +137,34 @@ public partial class AppDbContext : DbContext
 
             entity.Property(e => e.Activo).HasDefaultValue(true);
             entity.Property(e => e.Descripcion).HasMaxLength(150);
+        });
+
+        modelBuilder.Entity<PdfDocument>(entity =>
+        {
+            entity.HasKey(e => e.IdPdfDocument).HasName("PK__PdfDocum__0EE008FC7369E807");
+
+            entity.HasIndex(e => e.FechaCreacion, "IX_PdfDocuments_FechaCreacion");
+
+            entity.HasIndex(e => e.IdConversation, "IX_PdfDocuments_IdConversation");
+
+            entity.HasIndex(e => e.IdUsuario, "IX_PdfDocuments_IdUsuario");
+
+            entity.Property(e => e.ContentType)
+                .HasMaxLength(50)
+                .HasDefaultValue("application/pdf");
+            entity.Property(e => e.Description).HasMaxLength(500);
+            entity.Property(e => e.FechaCreacion).HasDefaultValueSql("(getutcdate())");
+            entity.Property(e => e.FileName).HasMaxLength(255);
+            entity.Property(e => e.Title).HasMaxLength(200);
+
+            entity.HasOne(d => d.IdConversationNavigation).WithMany(p => p.PdfDocuments)
+                .HasForeignKey(d => d.IdConversation)
+                .HasConstraintName("FK__PdfDocume__IdCon__5224328E");
+
+            entity.HasOne(d => d.IdUsuarioNavigation).WithMany(p => p.PdfDocuments)
+                .HasForeignKey(d => d.IdUsuario)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__PdfDocume__IdUsu__51300E55");
         });
 
         modelBuilder.Entity<Perfil>(entity =>
@@ -99,6 +176,65 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.Descripcion)
                 .HasMaxLength(100)
                 .IsUnicode(false);
+        });
+
+        modelBuilder.Entity<Receta>(entity =>
+        {
+            entity.HasKey(e => e.IdReceta);
+
+            entity.HasIndex(e => e.FechaCreacion, "IX_Recetas_FechaCreacion").IsDescending();
+
+            entity.HasIndex(e => e.IdUsuario, "IX_Recetas_IdUsuario");
+
+            entity.HasIndex(e => e.Nombre, "IX_Recetas_Nombre");
+
+            entity.Property(e => e.Activo).HasDefaultValue(true);
+            entity.Property(e => e.CaloriasTotales).HasColumnType("decimal(10, 2)");
+            entity.Property(e => e.CarbohidratosTotales).HasColumnType("decimal(10, 2)");
+            entity.Property(e => e.Descripcion).HasMaxLength(1000);
+            entity.Property(e => e.FechaCreacion).HasDefaultValueSql("(getutcdate())");
+            entity.Property(e => e.GrasasTotales).HasColumnType("decimal(10, 2)");
+            entity.Property(e => e.Nombre).HasMaxLength(200);
+            entity.Property(e => e.Porciones).HasDefaultValue(1);
+            entity.Property(e => e.ProteinasTotales).HasColumnType("decimal(10, 2)");
+
+            entity.HasOne(d => d.IdUsuarioNavigation).WithMany(p => p.Receta)
+                .HasForeignKey(d => d.IdUsuario)
+                .HasConstraintName("FK_Recetas_Usuarios");
+        });
+
+        modelBuilder.Entity<RecetasPdf>(entity =>
+        {
+            entity.HasKey(e => e.IdRecetaPdf);
+
+            entity.ToTable("RecetasPDF");
+
+            entity.HasIndex(e => e.FechaGeneracion, "IX_RecetasPDF_FechaGeneracion").IsDescending();
+
+            entity.HasIndex(e => e.IdUsuario, "IX_RecetasPDF_IdUsuario");
+
+            entity.Property(e => e.IdRecetaPdf).HasColumnName("IdRecetaPDF");
+            entity.Property(e => e.ArchivoPdf).HasColumnName("ArchivoPDF");
+            entity.Property(e => e.FechaGeneracion).HasDefaultValueSql("(getutcdate())");
+            entity.Property(e => e.NombrePdf)
+                .HasMaxLength(200)
+                .HasColumnName("NombrePDF");
+            entity.Property(e => e.NumeroRecetas).HasDefaultValue(1);
+
+            entity.HasOne(d => d.IdUsuarioNavigation).WithMany(p => p.RecetasPdfs)
+                .HasForeignKey(d => d.IdUsuario)
+                .HasConstraintName("FK_RecetasPDF_Usuarios");
+        });
+
+        modelBuilder.Entity<RecetasPdfDetalle>(entity =>
+        {
+            entity
+                .HasNoKey()
+                .ToTable("RecetasPDF_Detalle");
+
+            entity.Property(e => e.IdDetalle).ValueGeneratedOnAdd();
+            entity.Property(e => e.IdRecetaPdf).HasColumnName("IdRecetaPDF");
+            entity.Property(e => e.Orden).HasDefaultValue(1);
         });
 
         modelBuilder.Entity<Sexo>(entity =>
