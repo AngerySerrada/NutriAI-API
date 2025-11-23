@@ -72,6 +72,18 @@ namespace NutriAI_Core.DTOs.AI
         public string? ContextoIncluido { get; set; }
     }
 
+    // Nuevo: Request para filtrar historial
+    public sealed class FiltrarHistorialRequest
+    {
+        public DateTime? FechaInicio { get; set; }
+        public DateTime? FechaFin { get; set; }
+        public string? BuscarEnTitulo { get; set; }
+        public string? BuscarEnContenido { get; set; }
+        public bool? SoloActivas { get; set; } = true;
+        public int? Limite { get; set; } = 50;
+        public int? Offset { get; set; } = 0;
+    }
+
     // ============================================
     // ViewModels para la UI
     // ============================================
